@@ -24,6 +24,9 @@
 #include "disp_lcd.h"
 #include "disp_clk.h"
 
+static char* vga_para_name = "gpio_para";
+static char* vga_gpio_name = "gpio_pin_1";
+
 #ifdef UNUSED
 static __s32
 VGA_Init(void)
@@ -46,6 +49,16 @@ __s32 BSP_disp_vga_open(__u32 sel)
 	if (!(gdisp.screen[sel].status & VGA_ON)) {
 		__disp_vga_mode_t vga_mode;
 		__u32 i = 0;
+
+		__u32 vga_pwr_hdle = 0;
+		__u32 vgacode=0;
+		vga_pwr_hdle = gpio_request_ex(vga_para_name, vga_gpio_name);
+                if(vga_pwr_hdle)
+                {
+                        vgacode = gpio_write_one_pin_value(vga_pwr_hdle, 1, vga_gpio_name);
+                        gpio_release(vga_pwr_hdle, 2);
+                        DE_WRN("VGA PWREN OK,hdle:%d,code:%d!\n",vga_pwr_hdle,vgacode);
+                }
 
 		vga_mode = gdisp.screen[sel].vga_mode;
 
@@ -98,6 +111,15 @@ __s32 BSP_disp_vga_open(__u32 sel)
 __s32 BSP_disp_vga_close(__u32 sel)
 {
 	if (gdisp.screen[sel].status & VGA_ON) {
+
+		u32 vga_pwr_hdle = 0;
+		vga_pwr_hdle = gpio_request_ex(vga_para_name, NULL);
+        	if(vga_pwr_hdle)
+		{
+		    gpio_write_one_pin_value(vga_pwr_hdle, 0, vga_gpio_name);
+		    gpio_release(vga_pwr_hdle, 2);
+		    DE_WRN("VGA PWREN CLOSE!\n");
+		}
 		Image_close(sel);
 		TCON1_close(sel);
 		Disp_TVEC_Close(sel);
