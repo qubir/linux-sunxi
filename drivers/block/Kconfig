@@ -554,6 +554,18 @@ config BLK_DEV_RBD
 	  More information at http://ceph.newdream.net/.
 
 	  If unsure, say N.
+config SUN7I_LIBNAND
+       depends on BLOCK && ARCH_SUN7I
+       tristate "SUN7I Nand Library"
+        ---help---
+          Library for SUN7I Nand
+
+config SUN7I_NAND
+       depends on BLOCK && ARCH_SUN7I && SUN7I_LIBNAND
+       tristate "SUN7I Nandflash Driver"
+        ---help---
+          Nand flash driver for SUN7I
+
 
 config SUNXI_NAND
 	depends on BLOCK
